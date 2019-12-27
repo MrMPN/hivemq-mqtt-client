@@ -76,6 +76,7 @@ public class MqttConnectHandler extends MqttTimeoutInboundHandler {
     private final @NotNull MqttDisconnectOnConnAckHandler disconnectOnConnAckHandler;
 
     private boolean connectCalled = false;
+    private long connectFlushTime;
 
     @Inject
     MqttConnectHandler(
@@ -122,6 +123,7 @@ public class MqttConnectHandler extends MqttTimeoutInboundHandler {
      * @param ctx the channel handler context.
      */
     private void writeConnect(final @NotNull ChannelHandlerContext ctx) {
+        connectFlushTime = System.nanoTime();
         ctx.writeAndFlush((connect.getRawEnhancedAuthMechanism() == null) ?
                 connect.createStateful(clientConfig.getRawClientIdentifier(), null) : connect).addListener(this);
     }
@@ -163,8 +165,7 @@ public class MqttConnectHandler extends MqttTimeoutInboundHandler {
      */
     private void readConnAck(final @NotNull MqttConnAck connAck, final @NotNull Channel channel) {
         if (connAck.getReasonCode().isError()) {
-            MqttDisconnectUtil.close(channel, new Mqtt5ConnAckException(
-                    connAck,
+            MqttDisconnectUtil.close(channel, new Mqtt5ConnAckException(connAck,
                     "CONNECT failed as CONNACK contained an Error Code: " + connAck.getReasonCode() + "."));
 
         } else if (validateClientIdentifier(connAck, channel)) {
@@ -178,7 +179,8 @@ public class MqttConnectHandler extends MqttTimeoutInboundHandler {
 
             final int keepAlive = connectionConfig.getKeepAlive();
             if (keepAlive > 0) {
-                channel.pipeline().addAfter(MqttDecoder.NAME, MqttPingHandler.NAME, new MqttPingHandler(keepAlive));
+                final MqttPingHandler pingHandler = new MqttPingHandler(keepAlive, connectFlushTime, System.nanoTime());
+                channel.pipeline().addAfter(MqttDecoder.NAME, MqttPingHandler.NAME, pingHandler);
             }
 
             clientConfig.getRawState().set(MqttClientState.CONNECTED);
