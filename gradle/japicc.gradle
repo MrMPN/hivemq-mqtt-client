@@ -130,7 +130,7 @@ task japicc {
             String path = project.group.replace('.', '/')
             path += '/' + project.name + '/' + lastSemVer + '/'
             path += project.name + '-' + lastSemVer + '.jar'
-            new URL('http://central.maven.org/maven2/' + path)
+            new URL('https://repo1.maven.org/maven2/' + path)
                     .withInputStream { i -> lastJar.withOutputStream { it << i } }
         }
     }
@@ -144,7 +144,7 @@ task japicc {
             String path = project.group.replace('.', '/')
             path += '/' + shadedName + '/' + lastSemVer + '/'
             path += shadedName + '-' + lastSemVer + '.jar'
-            new URL('http://central.maven.org/maven2/' + path)
+            new URL('https://repo1.maven.org/maven2/' + path)
                     .withInputStream { i -> lastShadedJar.withOutputStream { it << i } }
         }
     }
