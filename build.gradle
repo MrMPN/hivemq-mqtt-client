@@ -87,6 +87,7 @@ dependencies {
     implementation group: 'org.jctools', name: 'jctools-core', version: jcToolsVersion
     implementation group: 'org.jetbrains', name: 'annotations', version: jetbrainsAnnotationsVersion
     implementation group: 'com.google.dagger', name: 'dagger', version: daggerVersion
+    implementation 'net.sourceforge.streamsupport:android-retrofuture:1.7.1'
     annotationProcessor group: 'com.google.dagger', name: 'dagger-compiler', version: daggerVersion
     compileOnly group: 'org.slf4j', name: 'slf4j-api', version: slf4jVersion
 }

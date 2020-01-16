@@ -7,4 +7,5 @@ ext {
 
 dependencies {
     implementation rootProject
+    implementation 'net.sourceforge.streamsupport:android-retrofuture:1.7.1'
 }
